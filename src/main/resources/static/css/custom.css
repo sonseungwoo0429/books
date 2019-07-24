@@ -1,0 +1,61 @@
+body {
+    padding-top: 2.5rem;
+    margin-bottom: 80px;
+    margin-left: 15%;
+}
+
+.container {
+    position: relative;
+    padding-left: 250px;
+    margin: 0px;
+}
+
+.content {
+    padding: 10px;
+}
+
+.logout {
+    background-color: #343a40 !important;
+}
+
+.search {
+    background-color: #343a40 !important;
+    border-color: #343a40 !important;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #5d5d5d;
+    color: #eee;
+    padding: 20px 0;
+}
+
+.error {
+    width: 100%;
+    text-align: center;
+}
+
+.big h1 {
+    font-size: 8.5rem;
+}
+
+.search-margin {
+    margin-left: 10px;
+    margin-right: 15px
+}
+
+.search-form {
+    margin-bottom: 30px;
+}
+
+.modal-content {
+    height: 600px;
+    width: 800px;
+}
+
+.modal-dialog {
+  max-width: 660px;
+}

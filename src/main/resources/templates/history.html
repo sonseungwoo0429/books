@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:sd="http://www.thymeleaf.org/spring-data">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>검색 히스토리</title>
+</head>
+<body>
+<div class="container" layout:fragment="content">
+    <table class="table">
+        <thead class="black white-text">
+        <tr>
+            <th scope="col">키워드</th>
+            <th scope="col">검색날짜</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-th-each="history : ${histories}">
+            <td>[[${history.keyword}]]</td>
+            <td>[[${#temporals.format(history.datetime, 'yyyy-MM-dd HH:mm:ss')}]]</td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${not #lists.isEmpty(histories.getContent())}" class="pagination justify-content-center">
+        <nav>
+            <ul class="pagination" sd:pagination="full">
+                <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true"></span></a></li>
+                <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+            </ul>
+        </nav>
+    </div>
+    <div th:if="${#lists.isEmpty(histories.getContent())}" class="pagination justify-content-center">
+        <h5>결과가 없습니다.</h5>
+    </div>
+</div>
+</body>
+</html>

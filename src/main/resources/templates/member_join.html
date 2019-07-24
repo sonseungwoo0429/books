@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{default}">
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>memberJoin</title>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+    <div class="text-center" style="padding:200px 0px; margin-left: 30%;">
+        <div class="col-md-6 col-md-offset-3">
+            <h1>회원가입</h1>
+            <div th:if="${param.reduplication}" class="alert alert-danger" role="alert">이미 존재하는 아이디 입니다.</div>
+            <form th:action="@{/singup/user}" method="post">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" class="form-control" autofocus="autofocus"
+                           placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+                </div>
+                <div>
+                    <input type="submit" name="singup" id="singup" class="form-control btn btn-info"
+                           value="가입하기">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

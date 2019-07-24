@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.thymeleaf.org/spring-data"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>검색</title>
+    <script th:inline="javascript">
+        let book = {}
+        $(document).ready(function () {
+            $('.myBtn').click(function () {
+                const books = [[${books}]];
+                const isbn = $(this).attr('value');
+                book = books.content.filter(it => it.isbn === isbn)[0];
+                let datetime = book.datetime ? book.datetime : book.dateToString;
+                let translators = book.translatorsToString;
+                let status = book.status;
+                let img = book.thumbnail ? book.thumbnail : '/img/no-image.png';
+                Object.keys(book).forEach((field) => {
+                    $(`#modal-${field}`).text(book[field])
+                });
+                $('#modal-img').attr('src', img);
+                $('#modal-img-href').prop('href', book.url);
+                $('#modal-datetime').text(datetime);
+                $('#modal-price').text(formatNumber(book.price) + "원");
+                $('#modal-salePrice').text(formatNumber(book.salePrice) + "원");
+
+                if(!translators){
+                    $('#modal-translator-no').hide();
+                }else{
+                    $('#modal-translator-no').show();
+                }
+
+                if(!status){
+                    $('#modal-status-no').hide();
+                }else{
+                    $('#modal-status-no').show();
+                }
+                $("#myModal").modal();
+            });
+        });
+
+        function formatNumber(num) {
+            return !num ? 0 : num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
+        }
+    </script>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <div class="content">
+        <form class="search-form" th:object="${searchData}">
+            <div class="form-inline">
+                <div class="form-group search-margin">
+                    <label class="search-margin" for="target">검색 필드 제한</label>
+                    <select class="form-control" name="target" id="target" th:field="*{target}">
+                        <option value="TITLE">title</option>
+                        <option value="ISBN">isbn</option>
+                        <option value="PUBLISHER">publisher</option>
+                        <option value="PERSON">person</option>
+                    </select>
+                </div>
+
+                <div class="form-group search-margin">
+                    <label class="search-margin" for="sort">정렬</label>
+                    <select class="form-control" name="sort" id="sort" th:field="*{sort}">
+                        <option value="ACCURACY">정확도순</option>
+                        <option value="LATEST">최신순</option>
+                    </select>
+                </div>
+
+                <div class="col-xs-8 search-margin">
+                    <input type="search" class="form-control" id="query" th:field="*{query}" placeholder="" name="query">
+                </div>
+                <div class="col-xs-4">
+                    <button type="submit" class="btn btn-primary search">Search</button>
+                </div>
+                <div class="form-group search-margin">
+                    <label th:each="error : ${#fields.errors('query')}" th:text="${error}"></label>
+                </div>
+            </div>
+        </form>
+        <div class="row" data-th-each="book : ${books}">
+            <div class="col-md-2">
+                <a class="myBtn" th:value="${book.isbn}" style="cursor:pointer">
+                    <img class="img-fluid rounded mb-3 mb-md-5" th:if="${not #lists.isEmpty(book.thumbnail)}"  th:src="${book.thumbnail}"/>
+                    <img class="img-fluid rounded mb-3 mb-md-5" th:unless="${not #lists.isEmpty(book.thumbnail)}"  th:src="'/img/no-image.png'"/>
+                </a>
+            </div>
+            <div class="col-md-5">
+                <a data-toggle="modal" class="myBtn" href="" th:value="${book.isbn}"><h4 th:utext="${book.title}"></h4></a>
+                <p th:utext="${book.contents}"></p>
+            </div>
+            <div class="col-md-3">
+                <p th:text="${book.authorsToString} + ' 지음'"></p>
+                <p th:if="${not #lists.isEmpty(book.translators)}" th:text="${book.translatorsToString} + ' 옮김'"></p>
+                <p th:if="${not #lists.isEmpty(book.datetime)}" th:text="${#temporals.format(book.datetime, 'yyyy-MM-dd')}"></p>
+                <p th:unless="${not #lists.isEmpty(book.datetime)}" th:text="${#temporals.format(book.dateToString, 'yyyy-MM-dd')}"></p>
+            </div>
+            <div class="col-md-2">
+                <p>정가</p>
+                <p style="text-decoration:line-through" th:utext="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')} + '원'"></p>
+                <p th:if="${not #lists.isEmpty(book.salePrice)}" th:utext="${#numbers.formatDecimal(book.salePrice, 0, 'COMMA', 0, 'POINT')} + '원'"></p>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(books.content)}" class="pagination justify-content-center">
+            <nav>
+                <ul class="pagination" sd:pagination="full">
+                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true"></span></a></li>
+                    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                </ul>
+            </nav>
+        </div>
+        <div th:if="${#lists.isEmpty(books.content)}" class="pagination justify-content-center">
+            <h5>검색 결과가 없습니다.</h5>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">책 소개</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <p>도서번호 : <strong id="modal-isbn"></strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <a target="_blank" id="modal-img-href">
+                                <img class="img-fluid rounded mb-3 mb-md-5" id="modal-img">
+                            </a>
+                        </div>
+                        <div class="col-md-5">
+                            <h4 id="modal-title"></h4>
+                            <p>저자 : <strong id="modal-authorsToString"></strong> 지음</p>
+                            <p id="modal-translator-no">역자 : <strong id="modal-translatorsToString"></strong> 옮김</p>
+                            <p>출판사 : <strong id="modal-publisher"></strong></p>
+                            <p>도서 출판날짜 : <strong id="modal-datetime"></strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p>정가</p>
+                            <p style="text-decoration:line-through" id="modal-price"></p>
+                            <p id="modal-salePrice"></p>
+                            <p id="modal-status-no">판매 상태  <strong id="modal-status"></strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h4>도서 소개</h4>
+                            <p id="modal-contents">
+                            <p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+    </div>
+</div>
+</body>
+</html>
